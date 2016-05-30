@@ -1,0 +1,10 @@
+{{template "header" .}}
+
+{{range $index,$element := .Items}}
+{{$index | Plus}} | {{.Name}} | {{.JingZuoCount}} | {{.JingZuoDuration}}
+<hr/>
+{{end}}
+
+{{template "footer" .}}
+
+

@@ -1,0 +1,23 @@
+{{template "header" .}}
+
+<table>
+<caption><h2>{{.Title}}</h2></caption>
+<tr>
+<th>排名</th>
+<th>姓名</th>
+<th>平均时间</th>
+<th>静坐次数</th>
+</tr>
+{{range $index,$element := .Items}}
+<tr>
+<td>{{$index | Plus}}</td>
+<td>{{.Name}}</td>
+<td>{{.JingZuoAvg}}</td>
+<td>{{.JingZuoCount}}</td>
+</tr>
+{{end}}
+</table>
+
+{{template "footer" .}}
+
+

@@ -1,0 +1,26 @@
+{{define "header"}}
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>{{.Title}}</title>
+<link type="text/css" rel="stylesheet" href="/static/style.css">
+<script type="text/javascript" src="/static/script.js"></script>
+<script type="text/javascript">
+
+</script>
+</link>
+</head>
+<body>
+
+<ul class="navbar">
+<li><a class="navbar_item" id="jz_avg" href="/jz/avg">平均静坐时间</a></li>
+<li><a class="navbar_item" id="jz_total" href="/jz/total">总静坐时间</a></li>
+<li><a class="navbar_item" id="zz_avg"  href="/zz/avg">平均站桩时间</a></li>
+<li><a class="navbar_item" id="zz_total" href="/zz/total">总站桩时间</a></li>
+<li><a class="navbar_item" id="time_morning" href="/time/morning">早安</a></li>
+<li><a class="navbar_item" id="time_night" href="/time/night">汇报</a></li>
+<!--<li><a class="navbar_item" id="raw" href="/raw">原始数据</a></li>-->
+</ul>
+<div id="clear-both"></div>
+{{end}}
