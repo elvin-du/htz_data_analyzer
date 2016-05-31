@@ -1,17 +1,16 @@
 package main
 
 import (
-	"log"
+	"htz_data_analyzer/log"
 )
 
-func init() {
-	log.SetFlags(log.Lshortfile)
-}
+//func init() {
+//	log.SetFlags(log.Lshortfile)
+//}
 
 func main() {
-    Parse()
-
+	Parse()
 	addr := ":60003"
-	log.Println("Runing at", addr)
+	log.Infoln("Runing at", addr)
 	Run(addr)
 }
