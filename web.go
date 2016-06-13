@@ -2,8 +2,8 @@ package main
 
 import (
 	"html/template"
+	"htz_data_analyzer/log"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -29,7 +29,7 @@ func init() {
 	//	TPL = TPL.Funcs(template.FuncMap{"Plus": plus})
 	//	TPL, err = TPL.ParseGlob("./pub/*.html")
 	//	if nil != err {
-	//		log.Fatal(err)
+	//		log.Fatalln(err)
 	//	}
 }
 
@@ -39,7 +39,7 @@ func Tmp() {
 	TPL = TPL.Funcs(template.FuncMap{"Plus": plus})
 	TPL, err = TPL.ParseGlob("./pub/*.html")
 	if nil != err {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 }
 
@@ -57,6 +57,13 @@ func plus(args ...interface{}) string {
 }
 
 func JZTotalHandler(w http.ResponseWriter, r *http.Request) {
+	if "elvin" != r.Header.Get("name") {
+		log.Errorln(r.Header.Get("name"))
+		w.WriteHeader(400)
+		w.Write([]byte(r.Header.Get("name")))
+		return
+	}
+	log.Debugln(r.URL.Path)
 	Tmp()
 	data := struct {
 		Title string
@@ -68,12 +75,13 @@ func JZTotalHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := TPL.ExecuteTemplate(w, "jztotal.html", data)
 	if nil != err {
-		log.Println(err)
+		log.Debugln(err)
 		w.Write([]byte(err.Error()))
 	}
 }
 
 func JZAvgHandler(w http.ResponseWriter, r *http.Request) {
+	log.Debugln(r.URL.Path)
 	Tmp()
 	data := struct {
 		Title string
@@ -85,12 +93,13 @@ func JZAvgHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := TPL.ExecuteTemplate(w, "jzavg.html", data)
 	if nil != err {
-		log.Println(err)
+		log.Debugln(err)
 		w.Write([]byte(err.Error()))
 	}
 }
 
 func ZZTotalHandler(w http.ResponseWriter, r *http.Request) {
+	log.Debugln(r.URL.Path)
 	Tmp()
 	data := struct {
 		Title string
@@ -102,12 +111,13 @@ func ZZTotalHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := TPL.ExecuteTemplate(w, "zztotal.html", data)
 	if nil != err {
-		log.Println(err)
+		log.Debugln(err)
 		w.Write([]byte(err.Error()))
 	}
 }
 
 func ZZAvgHandler(w http.ResponseWriter, r *http.Request) {
+	log.Debugln(r.URL.Path)
 	Tmp()
 	data := struct {
 		Title string
@@ -119,12 +129,13 @@ func ZZAvgHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := TPL.ExecuteTemplate(w, "zzavg.html", data)
 	if nil != err {
-		log.Println(err)
+		log.Debugln(err)
 		w.Write([]byte(err.Error()))
 	}
 }
 
 func TimeNightHandler(w http.ResponseWriter, r *http.Request) {
+	log.Debugln(r.URL.Path)
 	Tmp()
 	data := struct {
 		Title string
@@ -136,12 +147,13 @@ func TimeNightHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := TPL.ExecuteTemplate(w, "time_night.html", data)
 	if nil != err {
-		log.Println(err)
+		log.Debugln(err)
 		w.Write([]byte(err.Error()))
 	}
 }
 
 func TimeMorningHandler(w http.ResponseWriter, r *http.Request) {
+	log.Debugln(r.URL.Path)
 	Tmp()
 	data := struct {
 		Title string
@@ -153,12 +165,13 @@ func TimeMorningHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := TPL.ExecuteTemplate(w, "time_morning.html", data)
 	if nil != err {
-		log.Println(err)
+		log.Debugln(err)
 		w.Write([]byte(err.Error()))
 	}
 }
 
 func RawHandler(w http.ResponseWriter, r *http.Request) {
+	log.Debugln(r.URL.Path)
 	Tmp()
 	data := struct {
 		Title string
@@ -170,12 +183,13 @@ func RawHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := TPL.ExecuteTemplate(w, "raw.html", data)
 	if nil != err {
-		log.Println(err)
+		log.Debugln(err)
 		w.Write([]byte(err.Error()))
 	}
 }
 
 func UploadDataHandler(w http.ResponseWriter, r *http.Request) {
+	log.Debugln(r.URL.Path)
 	Tmp()
 	if r.Method == "GET" {
 		data := struct {
@@ -186,7 +200,7 @@ func UploadDataHandler(w http.ResponseWriter, r *http.Request) {
 
 		err := TPL.ExecuteTemplate(w, "upload.html", data)
 		if nil != err {
-			log.Println(err)
+			log.Debugln(err)
 			w.Write([]byte(err.Error()))
 		}
 		return
@@ -194,7 +208,7 @@ func UploadDataHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := r.ParseMultipartForm(32 << 20)
 	if nil != err {
-		log.Println(err)
+		log.Debugln(err)
 		w.WriteHeader(500)
 		w.Write([]byte(err.Error()))
 		return
@@ -202,18 +216,18 @@ func UploadDataHandler(w http.ResponseWriter, r *http.Request) {
 
 	f, fh, err := r.FormFile("data")
 	if nil != err {
-		log.Println(err)
+		log.Debugln(err)
 		w.WriteHeader(500)
 		w.Write([]byte(err.Error()))
 		return
 	}
 	defer f.Close()
 
-	log.Println("upload file mime:", fh.Header.Get("Content-Type"))
-	log.Println("filename:", fh.Filename)
+	log.Debugln("upload file mime:", fh.Header.Get("Content-Type"))
+	log.Debugln("filename:", fh.Filename)
 	bin, err := ioutil.ReadAll(f)
 	if nil != err {
-		log.Println(err)
+		log.Debugln(err)
 		w.WriteHeader(500)
 		w.Write([]byte(err.Error()))
 		return
@@ -221,7 +235,7 @@ func UploadDataHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = ioutil.WriteFile("data.txt", bin, os.ModePerm)
 	if nil != err {
-		log.Println(err)
+		log.Debugln(err)
 		w.WriteHeader(500)
 		w.Write([]byte(err.Error()))
 		return
@@ -229,7 +243,7 @@ func UploadDataHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = Parse()
 	if nil != err {
-		log.Println(err)
+		log.Debugln(err)
 		w.WriteHeader(500)
 		w.Write([]byte(err.Error()))
 		return
@@ -240,6 +254,6 @@ func UploadDataHandler(w http.ResponseWriter, r *http.Request) {
 
 func Run(addr string) {
 	if err := http.ListenAndServe(addr, nil); nil != err {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 }

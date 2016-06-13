@@ -4,8 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	//	"io/ioutil"
-	"log"
+	"htz_data_analyzer/log"
 	"os"
 	"regexp"
 	"sort"
@@ -28,34 +27,17 @@ var (
 )
 
 var (
-	regNameTime    = regexp.MustCompile(`(.*)(\s\s)(\d\d:\d\d)`)
-	regMorning     = regexp.MustCompile(`早安`)
-	regZhanZhuang  = regexp.MustCompile(`站桩(\d+)\+(\d+)`)
-	regZhanZhuang2 = regexp.MustCompile(`站椿(\d+)\+(\d+)`)
-	regZhanZhuang3 = regexp.MustCompile(`站桩(\d+)`)
-	regZhanZhuang4 = regexp.MustCompile(`站椿(\d+)`)
-	regZhanZhuang5 = regexp.MustCompile(`站桩:(\d+)`)
-	regZhanZhuang6 = regexp.MustCompile(`站桩 (\d+)`)
-
-	regJingZuo  = regexp.MustCompile(`静坐(\d+)\+(\d+)`)
-	regJingZuo2 = regexp.MustCompile(`靜坐(\d+)\+(\d+)`)
-	regJingZuo3 = regexp.MustCompile(`打坐(\d+)\+(\d+)`)
-	regJingZuo4 = regexp.MustCompile(`静坐(\d+)`)
-	regJingZuo5 = regexp.MustCompile(`靜坐(\d+)`)
-	regJingZuo6 = regexp.MustCompile(`打坐(\d+)`)
-	regJingZuo7 = regexp.MustCompile(`禅坐:(\d+)`)
-	regJingZuo8 = regexp.MustCompile(`靜坐 (\d+)`)
-	regJingZuo9 = regexp.MustCompile(`静坐 (\d+)`)
-
-	klmCount  = regexp.MustCompile(`宽(\d+)`)
-	klmCount2 = regexp.MustCompile(`宽两秒(\d+)`)
-	klmCount3 = regexp.MustCompile(`寛兩秒(\d+)`)
+	regNameTime   = regexp.MustCompile(`(.*)(\s\s)(\d\d:\d\d)`)
+	regMorning    = regexp.MustCompile(`早安`)
+	regZhanZhuang = regexp.MustCompile(`站桩(\d+)\+(\d+)`)
+	regJingZuo    = regexp.MustCompile(`静坐(\d+)\+(\d+)`)
+	klmCount      = regexp.MustCompile(`宽两秒(\d+)`)
 )
 
 func Parse() error {
 	f, err := os.Open("data.txt")
 	if nil != err {
-		log.Println(err)
+		log.Debugln(err)
 		return err
 	}
 	defer f.Close()
@@ -104,209 +86,24 @@ func Parse() error {
 				All[name].ZhanZhuangAvg = All[name].ZhanZhuangDuration / All[name].ZhanZhuangCount
 				goto JINGZUO
 			}
-
-			data = regZhanZhuang2.FindStringSubmatch(text)
-			if nil != data {
-				if !flag {
-					flag = true
-					All[name].ReportTime = append(All[name].ReportTime, t)
-				}
-				All[name].ZhanZhuangCount += 2
-				duration, _ := strconv.Atoi(data[1])
-				duration2, _ := strconv.Atoi(data[2])
-				All[name].ZhanZhuangDuration += duration + duration2
-				All[name].ZhanZhuangAvg = All[name].ZhanZhuangDuration / All[name].ZhanZhuangCount
-				goto JINGZUO
-			}
-
-			data = regZhanZhuang3.FindStringSubmatch(text)
-			if nil != data {
-				if !flag {
-					flag = true
-					All[name].ReportTime = append(All[name].ReportTime, t)
-				}
-				All[name].ZhanZhuangCount += 1
-				duration, _ := strconv.Atoi(data[1])
-				All[name].ZhanZhuangDuration += duration
-				All[name].ZhanZhuangAvg = All[name].ZhanZhuangDuration / All[name].ZhanZhuangCount
-				goto JINGZUO
-			}
-
-			data = regZhanZhuang4.FindStringSubmatch(text)
-			if nil != data {
-				if !flag {
-					flag = true
-					All[name].ReportTime = append(All[name].ReportTime, t)
-				}
-				All[name].ZhanZhuangCount += 1
-				duration, _ := strconv.Atoi(data[1])
-				All[name].ZhanZhuangDuration += duration
-				All[name].ZhanZhuangAvg = All[name].ZhanZhuangDuration / All[name].ZhanZhuangCount
-				goto JINGZUO
-			}
-
-			data = regZhanZhuang5.FindStringSubmatch(text)
-			if nil != data {
-				if !flag {
-					flag = true
-					All[name].ReportTime = append(All[name].ReportTime, t)
-				}
-				All[name].ZhanZhuangCount += 1
-				duration, _ := strconv.Atoi(data[1])
-				All[name].ZhanZhuangDuration += duration
-				All[name].ZhanZhuangAvg = All[name].ZhanZhuangDuration / All[name].ZhanZhuangCount
-				goto JINGZUO
-			}
-
-			data = regZhanZhuang6.FindStringSubmatch(text)
-			if nil != data {
-				if !flag {
-					flag = true
-					All[name].ReportTime = append(All[name].ReportTime, t)
-				}
-				All[name].ZhanZhuangCount += 1
-				duration, _ := strconv.Atoi(data[1])
-				All[name].ZhanZhuangDuration += duration
-				All[name].ZhanZhuangAvg = All[name].ZhanZhuangDuration / All[name].ZhanZhuangCount
-				goto JINGZUO
-			}
-		JINGZUO:
-			//静坐
-			data = regJingZuo.FindStringSubmatch(text)
-			if nil != data {
-				if !flag {
-					flag = true
-					All[name].ReportTime = append(All[name].ReportTime, t)
-				}
-				All[name].JingZuoCount += 2
-				duration, _ := strconv.Atoi(data[1])
-				duration2, _ := strconv.Atoi(data[2])
-				All[name].JingZuoDuration += duration + duration2
-				All[name].JingZuoAvg = All[name].JingZuoDuration / All[name].JingZuoCount
-				continue
-			}
-
-			data = regJingZuo2.FindStringSubmatch(text)
-			if nil != data {
-				if !flag {
-					flag = true
-					All[name].ReportTime = append(All[name].ReportTime, t)
-				}
-				All[name].JingZuoCount += 2
-				duration, _ := strconv.Atoi(data[1])
-				duration2, _ := strconv.Atoi(data[2])
-				All[name].JingZuoDuration += duration + duration2
-				All[name].JingZuoAvg = All[name].JingZuoDuration / All[name].JingZuoCount
-				continue
-			}
-
-			data = regJingZuo3.FindStringSubmatch(text)
-			if nil != data {
-				if !flag {
-					flag = true
-					All[name].ReportTime = append(All[name].ReportTime, t)
-				}
-				All[name].JingZuoCount += 2
-				duration, _ := strconv.Atoi(data[1])
-				duration2, _ := strconv.Atoi(data[2])
-				All[name].JingZuoDuration += duration + duration2
-				All[name].JingZuoAvg = All[name].JingZuoDuration / All[name].JingZuoCount
-				continue
-			}
-
-			data = regJingZuo4.FindStringSubmatch(text)
-			if nil != data {
-				if !flag {
-					flag = true
-					All[name].ReportTime = append(All[name].ReportTime, t)
-				}
-				All[name].JingZuoCount += 1
-				duration, _ := strconv.Atoi(data[1])
-				All[name].JingZuoDuration += duration
-				All[name].JingZuoAvg = All[name].JingZuoDuration / All[name].JingZuoCount
-				continue
-			}
-
-			data = regJingZuo5.FindStringSubmatch(text)
-			if nil != data {
-				if !flag {
-					flag = true
-					All[name].ReportTime = append(All[name].ReportTime, t)
-				}
-				All[name].JingZuoCount += 1
-				duration, _ := strconv.Atoi(data[1])
-				All[name].JingZuoDuration += duration
-				All[name].JingZuoAvg = All[name].JingZuoDuration / All[name].JingZuoCount
-				continue
-			}
-
-			data = regJingZuo6.FindStringSubmatch(text)
-			if nil != data {
-				if !flag {
-					flag = true
-					All[name].ReportTime = append(All[name].ReportTime, t)
-				}
-				All[name].JingZuoCount += 1
-				duration, _ := strconv.Atoi(data[1])
-				All[name].JingZuoDuration += duration
-				All[name].JingZuoAvg = All[name].JingZuoDuration / All[name].JingZuoCount
-				continue
-			}
-
-			data = regJingZuo7.FindStringSubmatch(text)
-			if nil != data {
-				if !flag {
-					flag = true
-					All[name].ReportTime = append(All[name].ReportTime, t)
-				}
-				All[name].JingZuoCount += 1
-				duration, _ := strconv.Atoi(data[1])
-				All[name].JingZuoDuration += duration
-				All[name].JingZuoAvg = All[name].JingZuoDuration / All[name].JingZuoCount
-				continue
-			}
-
-			data = regJingZuo8.FindStringSubmatch(text)
-			if nil != data {
-				if !flag {
-					flag = true
-					All[name].ReportTime = append(All[name].ReportTime, t)
-				}
-				All[name].JingZuoCount += 1
-				duration, _ := strconv.Atoi(data[1])
-				All[name].JingZuoDuration += duration
-				All[name].JingZuoAvg = All[name].JingZuoDuration / All[name].JingZuoCount
-				continue
-			}
-
-			data = regJingZuo9.FindStringSubmatch(text)
-			if nil != data {
-				if !flag {
-					flag = true
-					All[name].ReportTime = append(All[name].ReportTime, t)
-				}
-				All[name].JingZuoCount += 1
-				duration, _ := strconv.Atoi(data[1])
-				All[name].JingZuoDuration += duration
-				All[name].JingZuoAvg = All[name].JingZuoDuration / All[name].JingZuoCount
-				continue
-			}
-
-			//			data = klmCount.FindStringSubmatch(text)
-			//			if nil != data {
-			//				if !flag {
-			//					flag = true
-			//					All[name].ReportTime = append(All[name].ReportTime, t)
-			//				}
-			//				All[name].JingZuoCount += 1
-			//				duration, _ := strconv.Atoi(data[1])
-			//				All[name].JingZuoDuration += duration
-			//				All[name].JingZuoAvg = All[name].JingZuoDuration / All[name].JingZuoCount
-			//				continue
-			//			}
-
-			All[name].ReportCount = len(All[name].ReportTime)
 		}
+	JINGZUO:
+		//静坐
+		data = regJingZuo.FindStringSubmatch(text)
+		if nil != data {
+			if !flag {
+				flag = true
+				All[name].ReportTime = append(All[name].ReportTime, t)
+			}
+			All[name].JingZuoCount += 2
+			duration, _ := strconv.Atoi(data[1])
+			duration2, _ := strconv.Atoi(data[2])
+			All[name].JingZuoDuration += duration + duration2
+			All[name].JingZuoAvg = All[name].JingZuoDuration / All[name].JingZuoCount
+			continue
+		}
+
+		All[name].ReportCount = len(All[name].ReportTime)
 	}
 
 	for _, v := range All {
@@ -315,13 +112,13 @@ func Parse() error {
 			v3 := strings.Split(v2, ":")
 			hour, err := strconv.Atoi(v3[0])
 			if nil != err {
-				log.Println(err)
+				log.Debugln(err)
 				return err
 			}
 
 			sec, err := strconv.Atoi(v3[1])
 			if nil != err {
-				log.Println(err)
+				log.Debugln(err)
 				return err
 			}
 
@@ -344,13 +141,13 @@ func Parse() error {
 			v3 := strings.Split(v2, ":")
 			hour, err := strconv.Atoi(v3[0])
 			if nil != err {
-				log.Println(err)
+				log.Debugln(err)
 				return err
 			}
 
 			sec, err := strconv.Atoi(v3[1])
 			if nil != err {
-				log.Println(err)
+				log.Debugln(err)
 				return err
 			}
 
@@ -388,14 +185,14 @@ func Parse() error {
 
 	f2, err := os.Create("sorted.txt")
 	if nil != err {
-		log.Println(f2)
+		log.Debugln(f2)
 	}
 	defer f2.Close()
 
 	for _, v := range timeMorning {
 		bin, err := json.MarshalIndent(v, "", "    ")
 		if nil != err {
-			log.Println(err)
+			log.Debugln(err)
 			return err
 		}
 
@@ -403,7 +200,7 @@ func Parse() error {
 
 		_, err = f2.Write(bin)
 		if nil != err {
-			log.Println(err)
+			log.Debugln(err)
 			return err
 		}
 	}
